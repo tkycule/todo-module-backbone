@@ -8,6 +8,7 @@ class @App.Router extends Backbone.Router
   routes:
     '': 'index'
     'logout': 'logout'
+    'users/new': 'new_user'
 
   index: ->
     @skipLogin =>
@@ -20,6 +21,12 @@ class @App.Router extends Backbone.Router
       App.session.logout()
       Backbone.history.navigate('', true)
       Backbone.trigger('flash:show', {msg: 'ログアウトしました。'})
+
+  new_user: ->
+    @skipLogin =>
+      @currentView.remove() if @currentView
+      @currentView = new App.NewUserView()
+      $('#main').html(@currentView.render().el)
     
   skipLogin: (callback) ->
     unless App.session.currentUser()
