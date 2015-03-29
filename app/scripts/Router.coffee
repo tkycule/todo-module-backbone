@@ -10,6 +10,7 @@ class @App.Router extends Backbone.Router
     'logout': 'logout'
     'users/new': 'new_user'
     'tasks(/:filter)': 'tasks'
+    'tasks/:id/edit': 'edit_task'
 
   index: ->
     @skipLogin =>
@@ -42,6 +43,19 @@ class @App.Router extends Backbone.Router
       unless @currentView instanceof App.TasksView
         @currentView.remove() if @currentView
         @currentView = new App.TasksView(collection: @tasksCollection)
+        $('#main').html(@currentView.render().el)
+
+  edit_task: (id) ->
+    @requireLogin =>
+      @currentView.remove() if @currentView
+
+      defer = []
+      unless @tasksCollection
+        @tasksCollection = new App.TasksCollection()
+        defer = @tasksCollection.fetch({reset: true})
+
+      $.when(defer).done =>
+        @currentView = new App.EditTaskView(model: @tasksCollection.findWhere(id: parseInt(id)))
         $('#main').html(@currentView.render().el)
     
   skipLogin: (callback) ->
