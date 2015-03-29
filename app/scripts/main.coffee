@@ -3,4 +3,11 @@ $(document).on('click', 'a[href]', (e) ->
   Backbone.history.navigate($(this).attr('href').substr(1), true)
 )
 
+$.ajaxSetup({
+  dataType: 'json'
+  beforeSend: (xhr) ->
+    if currentUser = App.session.currentUser()
+      xhr.setRequestHeader('Authorization', currentUser.get('authentication_token'))
+})
+
 @App = {}

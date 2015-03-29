@@ -9,6 +9,7 @@ class @App.Router extends Backbone.Router
     '': 'index'
     'logout': 'logout'
     'users/new': 'new_user'
+    'tasks(/:filter)': 'tasks'
 
   index: ->
     @skipLogin =>
@@ -27,6 +28,21 @@ class @App.Router extends Backbone.Router
       @currentView.remove() if @currentView
       @currentView = new App.NewUserView()
       $('#main').html(@currentView.render().el)
+
+  tasks: (filter) ->
+    @requireLogin =>
+
+      App.filter = filter || 'inbox'
+      Backbone.trigger('tasks:filter')
+
+      unless @tasksCollection
+        @tasksCollection = new App.TasksCollection()
+        @tasksCollection.fetch({reset: true})
+
+      unless @currentView instanceof App.TasksView
+        @currentView.remove() if @currentView
+        @currentView = new App.TasksView(collection: @tasksCollection)
+        $('#main').html(@currentView.render().el)
     
   skipLogin: (callback) ->
     unless App.session.currentUser()
